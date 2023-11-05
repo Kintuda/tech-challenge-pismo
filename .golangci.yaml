@@ -1,0 +1,19 @@
+linters:
+  presets:
+    - bugs
+    - complexity
+    - error
+    - format
+    - import
+    - metalinter
+    - module
+    - performance
+    - sql
+    - test
+    - unused
+  disable:
+    - wrapcheck
+    - revive
+    - exhaustivestruct
+    - exhaustruct
+    - funlen
