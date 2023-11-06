@@ -1,29 +1,51 @@
+## Tech demo for Pismo interview
 
+This README provides instructions on how to set up and run the project.
 
-#### Setup
+#### Requirements to start the project
 
-To setup  
+- Docker
+- docker-compose
+- air
+- golang ~v1.21.1
 
-[how to install air]
+#### How to Set Up
+1. Clone the repository locally:
+```bash
+git clone git@github.com:Kintuda/tech-challenge-pismo.git
+```
 
-[how installing go deps]
+2. Create a .env file with your local settings. You can use the .env.example file as a template to start.
 
-[how to install tilt [optional]]
-[how to install docker]
+* Install the required dependencies using Go modules:
+```
+go mod tidy
+```
 
+3. Start docker-compose and spin the Postgres container
+```bash
+docker-compose up -d
+```
 
-#### Local development
+4. Run the migration files
+```bash
+make migration-up
+```
 
-
-#### Local development with tilt
-
+5. Start the API
+```bash
+go run main.go serve
+OR
+make dev
+```
 
 #### Creating new migrations
-
-this project migrations
 
 ```
 make create-new-migration name="operation type seed"
 ```
 
 #### Running test
+```
+make test
+```

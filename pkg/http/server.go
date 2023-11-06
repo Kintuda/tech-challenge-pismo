@@ -23,7 +23,7 @@ func NewServer(router *Router, port string) *Server {
 		WriteTimeout:      30 * time.Second,
 		IdleTimeout:       30 * time.Second,
 		ReadHeaderTimeout: 3 * time.Second,
-		Handler:           router.engine,
+		Handler:           router.Engine,
 	}
 
 	return &Server{

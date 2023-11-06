@@ -1,0 +1,109 @@
+openapi: 3.0.3
+info:
+  title: Tech demo
+  description: Tech challenge for Pismo
+  contact: {}
+  version: 1.0.0
+paths:
+  /v1/accounts:
+    post:
+      description: ''
+      summary: Create Account
+      tags:
+        - Account
+      parameters: []
+      responses:
+        '201':
+          description: successful
+          content:
+            application/json:
+              examples:
+                Created account:
+                  value: "{\n\t\"account_id\": \"ece5b6d8-761b-4fb7-ba64-21f4c0031f99\",\n\t\"document_number\": \"11233311123\"\n}"
+        '422':
+          description: validation failed
+          content:
+            application/json:
+              examples:
+                Validation error:
+                  value: "{\n\t\"message\": \"validation error\",\n\t\"errors\": [\n\t\t{\n\t\t\t\"field\": \"document_number\",\n\t\t\t\"value\": \"\",\n\t\t\t\"constraint\": \"required\",\n\t\t\t\"description\": \"field is required and should not be null nor empty\"\n\t\t}\n\t]\n}"
+        '500':
+          description: unknown server error
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                document_number: '11361429917'
+  /v1/transactions:
+    post:
+      description: Create a transaction
+      summary: 'Create Transaction '
+      tags:
+        - Transaction
+      parameters: []
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              examples:
+                Transaction created:
+                  value: "{\n\t\"id\": \"7086826d-d584-4ce9-887d-24953aaddedd\",\n\t\"account_id\": \"b34fda9a-1389-470f-9b7a-d5241aa6aee2\",\n\t\"operation_type_id\": \"80025b43-cd09-47fa-8dc3-fa2dc7f14d11\",\n\t\"amount\": \"-100\",\n\t\"event_date\": \"2023-11-06T01:23:51.590879-03:00\"\n}"
+        '422':
+          description: validation failed
+          content:
+            application/json:
+              examples:
+                Validation error:
+                  value: "{\n\t\"message\": \"validation error\",\n\t\"errors\": [\n\t\t{\n\t\t\t\"field\": \"amount\",\n\t\t\t\"value\": \"\",\n\t\t\t\"constraint\": \"required\",\n\t\t\t\"description\": \"field is required and should not be null nor empty\"\n\t\t}\n\t]\n}"
+        '500':
+          description: unknown server error
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                account_id: 2ce5b6d8-761b-4fb7-ba64-21f4c0031f99
+                operation_type_id: 80025b43-cd09-47fa-8dc3-fa2dc7f14d11
+                amount: '-100'
+      security: []
+  /v1/accounts/{id}:
+    get:
+      description: Fetch a account by the id
+      summary: Get account
+      tags:
+        - Account
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: Account ID
+      responses:
+        '201':
+          description: successful
+          content:
+            application/json:
+              examples:
+                Get account:
+                  value: "{\n\t\"account_id\": \"b34fda9a-1389-470f-9b7a-d5241aa6aee2\",\n\t\"document_number\": \"11361429917\"\n}"
+        '404':
+          description: Account not found
+          content:
+            application/json:
+              examples:
+                Account not found:
+                  value: "{\n\t\"message\": \"account not found\"\n}"
+        '500':
+          description: unknown server error
+      security: []
+servers:
+  - description: Local environment
+    url: http://localhost:3000
+tags: []

@@ -13,9 +13,9 @@ import (
 )
 
 var (
-	errAccountNotFound         = errors.New("account not found")
-	errInvalidAmount           = errors.New("invalid amount")
-	errTransactionTypeNotFound = errors.New("transaction type not found")
+	ErrAccountNotFound         = errors.New("account not found")
+	ErrInvalidAmount           = errors.New("invalid amount")
+	ErrTransactionTypeNotFound = errors.New("transaction type not found")
 )
 
 type TransactionService struct {
@@ -66,7 +66,7 @@ func (t *TransactionService) CreateTransaction(ctx context.Context, operationTyp
 
 	if account == nil {
 		log.Instance.Warn().Msg("account not found")
-		return nil, errAccountNotFound
+		return nil, ErrAccountNotFound
 	}
 
 	operationType, err := t.repo.GetOperationType(ctx, operationTypeID)
@@ -78,14 +78,14 @@ func (t *TransactionService) CreateTransaction(ctx context.Context, operationTyp
 
 	if operationType == nil {
 		log.Instance.Warn().Msg("transaction type not found")
-		return nil, errTransactionTypeNotFound
+		return nil, ErrTransactionTypeNotFound
 	}
 
 	parsedAmount, err := t.ParseDecimal(amount, *operationType)
 
 	if err != nil {
 		log.Instance.Error().Err(err).Msg("invalid amount")
-		return nil, errInvalidAmount
+		return nil, ErrInvalidAmount
 	}
 
 	transaction := Transaction{

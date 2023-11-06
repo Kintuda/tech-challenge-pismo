@@ -12,8 +12,8 @@ type TransactionController struct {
 }
 
 type CreateTransaction struct {
-	AccountID       string `json:"account_id" binding:"required"`
-	OperationTypeID string `json:"operation_type_id" binding:"required"`
+	AccountID       string `json:"account_id" binding:"required,uuid"`
+	OperationTypeID string `json:"operation_type_id" binding:"required,uuid"`
 	Amount          string `json:"amount" binding:"required"`
 }
 

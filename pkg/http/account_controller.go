@@ -48,6 +48,7 @@ func (a *AccountController) CreateAccount(c *gin.Context) {
 
 func (a *AccountController) GetAccount(c *gin.Context) {
 	id := c.Param("id")
+
 	account, err := a.service.GetAccount(c.Request.Context(), id)
 
 	if err != nil {

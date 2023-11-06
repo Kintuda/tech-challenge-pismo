@@ -12,9 +12,9 @@ const (
 )
 
 type Router struct {
-	engine      *gin.Engine
-	account     *AccountController
-	transaction *TransactionController
+	Engine      *gin.Engine
+	Account     *AccountController
+	Transaction *TransactionController
 }
 
 func NewRouter(
@@ -37,39 +37,25 @@ func NewRouter(
 		router.Use(otelgin.Middleware("tech-challenge-pismo-server"))
 	}
 
-	// if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
-	// 	validators := map[string]validator.Func{
-	// 		"brazilianDocumentNumber": helper.BrazilianDocumentNumber,
-	// 	}
-
-	// 	for key, value := range validators {
-	// 		if err := v.RegisterValidation(key, value); err != nil {
-	// 			log.Error().Msgf("cannot register validation %s", key)
-	// 		}
-	// 	}
-
-	// 	v.RegisterCustomTypeFunc(helper.ValidateJSONDateType, carbon.Date{})
-	// }
-
 	return &Router{
-		engine:      router,
-		account:     accountController,
-		transaction: transactionController,
+		Engine:      router,
+		Account:     accountController,
+		Transaction: transactionController,
 	}
 }
 
 func (r *Router) RegisterRoutes(t *middleware.TransactionMiddleware) {
-	// r.engine.Use(ErrorHandler())
-	v1 := r.engine.Group("/v1")
+	r.Engine.Use(ErrorHandler())
+	v1 := r.Engine.Group("/v1")
 
 	v1.GET("/status", func(ctx *gin.Context) {
 		ctx.JSON(200, gin.H{})
 	})
 
 	account := v1.Group("/accounts")
-	account.GET("/:id", r.account.GetAccount)
-	account.POST("/", t.OpenTransaction(), r.account.CreateAccount)
+	account.GET("/:id", r.Account.GetAccount)
+	account.POST("/", t.OpenTransaction(), r.Account.CreateAccount)
 
 	transaction := v1.Group("/transactions")
-	transaction.POST("/", r.transaction.CreateTransaction)
+	transaction.POST("/", r.Transaction.CreateTransaction)
 }

@@ -1,10 +1,6 @@
 
 [OPENAPI - DOCS]
-[README]
 [github-ci, test, linter and build]
-[ERROR HANDLER]
-[IDEMPOTENCY]
-[tilt-k8s]
 
 
 Tests cases
