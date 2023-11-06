@@ -1,6 +1,6 @@
 ## Tech demo for Pismo interview
 
-This README provides instructions on how to set up and run the project.
+This README provides instructions on how to set up and run the project. 
 
 #### Requirements to start the project
 
