@@ -16,7 +16,6 @@ func ErrorHandler() gin.HandlerFunc {
 		c.Next()
 
 		for _, err := range c.Errors {
-
 			switch {
 			case errors.Is(err, io.EOF):
 				c.JSON(http.StatusBadRequest, gin.H{"message": "request body is empty"})

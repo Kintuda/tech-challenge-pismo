@@ -40,7 +40,6 @@ make dev
 ```
 
 #### Creating new migrations
-
 ```
 make create-new-migration name="operation type seed"
 ```

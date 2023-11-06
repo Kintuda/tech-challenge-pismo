@@ -5,7 +5,7 @@ import (
 
 	"github.com/kintuda/tech-challenge-pismo/pkg/config"
 	"github.com/kintuda/tech-challenge-pismo/pkg/postgres"
-	log "github.com/sirupsen/logrus"
+	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 )
 
@@ -61,7 +61,7 @@ func migrationDown(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	log.Infof("Successful migrate, %v resources", n)
+	log.Info().Msgf("Successful migrate, %v resources", n)
 	return nil
 }
 
@@ -85,7 +85,7 @@ func migrationUp(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	log.Infof("Successful migrate, %v resources", n)
+	log.Info().Msgf("Successful migrate, %v resources", n)
 	return nil
 }
 

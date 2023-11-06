@@ -16,7 +16,6 @@ func NewRootCmd() *cobra.Command {
 
 	rootCmd.AddCommand(NewServerCmd(ctx))
 	rootCmd.AddCommand(NewMigrationCmd())
-	rootCmd.AddCommand(NewMigrationCmd())
 
 	return rootCmd
 }
