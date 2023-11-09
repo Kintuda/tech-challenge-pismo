@@ -9,6 +9,8 @@ import (
 	"github.com/kintuda/tech-challenge-pismo/pkg/http"
 	"github.com/kintuda/tech-challenge-pismo/pkg/middleware"
 	"github.com/kintuda/tech-challenge-pismo/pkg/postgres"
+	"github.com/kintuda/tech-challenge-pismo/pkg/queue"
+	ratelimiter "github.com/kintuda/tech-challenge-pismo/pkg/rate_limiter"
 	tracer "github.com/kintuda/tech-challenge-pismo/pkg/tracing"
 	"github.com/kintuda/tech-challenge-pismo/pkg/transaction"
 	"github.com/rs/zerolog/log"
@@ -35,6 +37,8 @@ func StartServer(cmd *cobra.Command, arg []string) error {
 		middleware.Module,
 		account.Module,
 		transaction.Module,
+		queue.Module,
+		ratelimiter.Module,
 		fx.Invoke(runHttpServer()),
 	)
 

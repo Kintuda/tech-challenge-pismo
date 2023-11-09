@@ -9,6 +9,8 @@ import (
 	"github.com/google/uuid"
 	"github.com/kintuda/tech-challenge-pismo/pkg/account"
 	"github.com/kintuda/tech-challenge-pismo/pkg/logger"
+	"github.com/kintuda/tech-challenge-pismo/pkg/notifications"
+	ratelimiter "github.com/kintuda/tech-challenge-pismo/pkg/rate_limiter"
 	"github.com/rs/zerolog/log"
 )
 
@@ -20,13 +22,15 @@ var (
 
 type TransactionService struct {
 	accountService *account.AccountService
+	rate           *ratelimiter.CounterLimiter
 	repo           TransactionRepository
 }
 
-func NewTransactionService(repo TransactionRepository, accountService *account.AccountService) *TransactionService {
+func NewTransactionService(repo TransactionRepository, accountService *account.AccountService, rate *ratelimiter.CounterLimiter) *TransactionService {
 	return &TransactionService{
 		repo:           repo,
 		accountService: accountService,
+		rate:           rate,
 	}
 }
 
@@ -100,6 +104,20 @@ func (t *TransactionService) CreateTransaction(ctx context.Context, operationTyp
 		log.Instance.Error().Err(err).Msg("error while processing transaction")
 		return nil, err
 	}
+
+	orchestrator := notifications.NewNotificationOrchestrator()
+
+	if err := orchestrator.SendNotifications(transaction); err != nil {
+		log.Instance.Error().Err(err).Msg("notification failed")
+	}
+
+	if !t.rate.GetInstance("1").Allow() {
+		log.Instance.Error().Err(err).Msg("throttle")
+
+		return nil, errors.New("throttle")
+	}
+
+	orchestrator.Read()
 
 	return &transaction, nil
 }
