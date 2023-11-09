@@ -117,9 +117,6 @@ func (t *TransactionService) CreateTransaction(ctx context.Context, operationTyp
 
 		for _, trx := range pendingTransactions {
 			if trx.Balance.Negative {
-				zero := new(apd.Decimal)
-				zero.SetString("0")
-
 				dst := new(apd.Decimal)
 				newBalance := apd.BaseContext.WithPrecision(5)
 
@@ -129,6 +126,9 @@ func (t *TransactionService) CreateTransaction(ctx context.Context, operationTyp
 				}
 
 				if !dst.Negative {
+					zero := new(apd.Decimal)
+					zero.SetString("0")
+
 					if err := t.repo.UpdateTransactionBalance(ctx, trx.ID, trx.AccountID, zero); err != nil {
 						log.Instance.Error().Err(err).Msg("error while processing transaction")
 						return nil, err
