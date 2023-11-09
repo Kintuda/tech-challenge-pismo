@@ -1,0 +1,4 @@
+INSERT INTO public.transactions (account_id,operation_type_id,amount,event_date,id,balance) VALUES
+	 ('a4a43e1e-30c6-4989-8d64-bc3a3d350eb8','db0c579e-fa2a-442c-bb21-48c1d65feeac',-50.00,'2023-11-09 10:29:18.172','c151681c-0cce-4292-b632-6f67c2508fc9',-50.00),
+	 ('a4a43e1e-30c6-4989-8d64-bc3a3d350eb8','db0c579e-fa2a-442c-bb21-48c1d65feeac',-23.50,'2023-11-09 10:29:36.525','c0358e19-0376-4c04-8bcf-9b985411c0f3',-23.50),
+	 ('a4a43e1e-30c6-4989-8d64-bc3a3d350eb8','db0c579e-fa2a-442c-bb21-48c1d65feeac',-18.70,'2023-11-09 10:29:45.060','3f6f2d97-124e-416a-9d27-a834bab29298',-18.70);

@@ -94,11 +94,64 @@ func (t *TransactionService) CreateTransaction(ctx context.Context, operationTyp
 		OperationTypeID: operationType.ID,
 		Amount:          parsedAmount,
 		EventDate:       time.Now(),
+		Balance:         parsedAmount,
 	}
 
-	if err := t.repo.CreateTransaction(ctx, transaction); err != nil {
-		log.Instance.Error().Err(err).Msg("error while processing transaction")
-		return nil, err
+	if operationType.OperationOperator == Positive {
+		pendingTransactions, err := t.repo.ListTransactionRemainingBalance(ctx, accountID)
+
+		if err != nil {
+			log.Instance.Error().Err(err).Msg("error while searching pending transaction")
+			return nil, err
+		}
+
+		if len(pendingTransactions) <= 0 {
+			if err := t.repo.CreateTransaction(ctx, transaction); err != nil {
+				log.Instance.Error().Err(err).Msg("error while processing transaction")
+				return nil, err
+			}
+		}
+
+		remainingBalance := new(apd.Decimal)
+		remainingBalance.Set(transaction.Amount)
+
+		for _, trx := range pendingTransactions {
+			if trx.Balance.Negative {
+				if remainingBalance.Cmp(trx.Balance) > 0 {
+					if err := t.repo.UpdateTransactionBalance(ctx, trx.ID, trx.AccountID, "0"); err != nil {
+						log.Instance.Error().Err(err).Msg("error while processing transaction")
+						return nil, err
+					}
+
+					dst := new(apd.Decimal)
+					newBalance := apd.BaseContext.WithPrecision(5)
+
+					if _, err = newBalance.Sub(dst, remainingBalance, trx.Balance); err != nil {
+						log.Instance.Error().Err(err).Msg("error while sub new balance")
+						return nil, err
+					}
+
+					remainingBalance.Set(dst)
+				} else {
+					//partial settlement
+				}
+			}
+
+			//Insert transaction and update in the database the old transaction balance, and update the remaining balance
+			transaction.Balance = remainingBalance
+
+			if err := t.repo.CreateTransaction(ctx, transaction); err != nil {
+				log.Instance.Error().Err(err).Msg("error while processing transaction")
+				return nil, err
+			}
+
+			return &transaction, nil
+		}
+	} else {
+		if err := t.repo.CreateTransaction(ctx, transaction); err != nil {
+			log.Instance.Error().Err(err).Msg("error while processing transaction")
+			return nil, err
+		}
 	}
 
 	return &transaction, nil
