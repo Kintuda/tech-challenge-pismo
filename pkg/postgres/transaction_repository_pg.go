@@ -3,6 +3,7 @@ package postgres
 import (
 	"context"
 
+	"github.com/cockroachdb/apd"
 	"github.com/georgysavva/scany/v2/pgxscan"
 	"github.com/kintuda/tech-challenge-pismo/pkg/transaction"
 )
@@ -13,17 +14,17 @@ type TransactionRepositoryPg struct {
 	PgRepository
 }
 
-func (t *TransactionRepositoryPg) UpdateTransactionBalance(ctx context.Context, transactionID, accountID string, amount string) error {
-	sql := "UPDATE transactions SET balance = 0 WHERE id = $1 AND account_id = $2"
+func (t *TransactionRepositoryPg) UpdateTransactionBalance(ctx context.Context, transactionID, accountID string, amount *apd.Decimal) error {
+	sql := "UPDATE transactions SET balance = $1 WHERE id = $2 AND account_id = $3"
 
-	_, err := t.GetExecutor(ctx).Exec(ctx, sql, transactionID, accountID)
+	_, err := t.GetExecutor(ctx).Exec(ctx, sql, amount, transactionID, accountID)
 
 	return err
 }
 
 func (t *TransactionRepositoryPg) ListTransactionRemainingBalance(ctx context.Context, accountID string) ([]*transaction.Transaction, error) {
 	results := make([]*transaction.Transaction, 0)
-	sql := "SELECT * FROM transactions WHERE balance < 0 AND account_id = $1"
+	sql := "SELECT * FROM transactions WHERE balance < 0 AND account_id = $1 ORDER BY event_date ASC"
 
 	if err := pgxscan.Select(ctx, t.GetExecutor(ctx), &results, sql, accountID); err != nil {
 		return nil, err

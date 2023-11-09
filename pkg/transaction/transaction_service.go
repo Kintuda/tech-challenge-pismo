@@ -117,8 +117,19 @@ func (t *TransactionService) CreateTransaction(ctx context.Context, operationTyp
 
 		for _, trx := range pendingTransactions {
 			if trx.Balance.Negative {
-				if remainingBalance.Cmp(trx.Balance) > 0 {
-					if err := t.repo.UpdateTransactionBalance(ctx, trx.ID, trx.AccountID, "0"); err != nil {
+				zero := new(apd.Decimal)
+				zero.SetString("0")
+
+				dst := new(apd.Decimal)
+				newBalance := apd.BaseContext.WithPrecision(5)
+
+				if _, err = newBalance.Add(dst, remainingBalance, trx.Balance); err != nil {
+					log.Instance.Error().Err(err).Msg("error while add new balance")
+					return nil, err
+				}
+
+				if !dst.Negative {
+					if err := t.repo.UpdateTransactionBalance(ctx, trx.ID, trx.AccountID, zero); err != nil {
 						log.Instance.Error().Err(err).Msg("error while processing transaction")
 						return nil, err
 					}
@@ -126,27 +137,39 @@ func (t *TransactionService) CreateTransaction(ctx context.Context, operationTyp
 					dst := new(apd.Decimal)
 					newBalance := apd.BaseContext.WithPrecision(5)
 
-					if _, err = newBalance.Sub(dst, remainingBalance, trx.Balance); err != nil {
-						log.Instance.Error().Err(err).Msg("error while sub new balance")
+					if _, err = newBalance.Add(dst, remainingBalance, trx.Balance); err != nil {
+						log.Instance.Error().Err(err).Msg("error while add new balance")
 						return nil, err
 					}
 
 					remainingBalance.Set(dst)
 				} else {
-					//partial settlement
+					dst := new(apd.Decimal)
+					balanceCtx := apd.BaseContext.WithPrecision(5)
+
+					if _, err = balanceCtx.Add(dst, remainingBalance, trx.Balance); err != nil {
+						log.Instance.Error().Err(err).Msg("error while add new balance")
+						return nil, err
+					}
+
+					if err := t.repo.UpdateTransactionBalance(ctx, trx.ID, trx.AccountID, dst); err != nil {
+						log.Instance.Error().Err(err).Msg("error while processing transaction")
+						return nil, err
+					}
+
+					remainingBalance.SetFloat64(0)
 				}
 			}
-
-			//Insert transaction and update in the database the old transaction balance, and update the remaining balance
-			transaction.Balance = remainingBalance
-
-			if err := t.repo.CreateTransaction(ctx, transaction); err != nil {
-				log.Instance.Error().Err(err).Msg("error while processing transaction")
-				return nil, err
-			}
-
-			return &transaction, nil
 		}
+
+		transaction.Balance = remainingBalance
+
+		if err := t.repo.CreateTransaction(ctx, transaction); err != nil {
+			log.Instance.Error().Err(err).Msg("error while processing transaction")
+			return nil, err
+		}
+
+		return &transaction, nil
 	} else {
 		if err := t.repo.CreateTransaction(ctx, transaction); err != nil {
 			log.Instance.Error().Err(err).Msg("error while processing transaction")
