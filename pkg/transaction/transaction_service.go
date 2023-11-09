@@ -9,7 +9,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/kintuda/tech-challenge-pismo/pkg/account"
 	"github.com/kintuda/tech-challenge-pismo/pkg/logger"
-	"github.com/kintuda/tech-challenge-pismo/pkg/notifications"
 	ratelimiter "github.com/kintuda/tech-challenge-pismo/pkg/rate_limiter"
 	"github.com/rs/zerolog/log"
 )
@@ -105,19 +104,21 @@ func (t *TransactionService) CreateTransaction(ctx context.Context, operationTyp
 		return nil, err
 	}
 
-	orchestrator := notifications.NewNotificationOrchestrator()
+	// orchestrator := notifications.NewNotificationOrchestrator()
 
-	if err := orchestrator.SendNotifications(transaction); err != nil {
-		log.Instance.Error().Err(err).Msg("notification failed")
-	}
+	// if err := orchestrator.SendNotifications(transaction); err != nil {
+	// 	log.Instance.Error().Err(err).Msg("notification failed")
+	// }
 
-	if !t.rate.GetInstance("1").Allow() {
-		log.Instance.Error().Err(err).Msg("throttle")
+	// if !t.rate.GetInstance("1").Allow() {
+	// 	log.Instance.Error().Err(err).Msg("throttle")
 
-		return nil, errors.New("throttle")
-	}
+	// 	return nil, errors.New("throttle")
+	// }
 
-	orchestrator.Read()
+	// orchestrator.Read()
+
+	Validate(transaction)
 
 	return &transaction, nil
 }
